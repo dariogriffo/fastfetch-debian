@@ -1,0 +1,8 @@
+Section: utils
+Priority: optional
+Maintainer: Dario Griffo <dariogriffo@gmail.com>
+Homepage: https://github.com/fastfetch-cli/fastfetch
+Package: fastfetch
+Version: fastfetch_VERSION-BUILD_VERSION~DIST
+Architecture: SUPPORTED_ARCHITECTURES
+Description: neofetch-like tool for fetching system information and displaying it in a pretty way.

@@ -1,0 +1,46 @@
+#!/usr/bin/make -f
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+FF_VERSION := $(shell dpkg-parsechangelog -S Version | sed 's/[-~].*//')
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+
+override_dh_auto_build:
+	@arch="$(DEB_HOST_ARCH)"; \
+	case "$$arch" in \
+		amd64)   FF_RELEASE="fastfetch-linux-amd64" ;; \
+		arm64)   FF_RELEASE="fastfetch-linux-aarch64" ;; \
+		armel)   FF_RELEASE="fastfetch-linux-armv6l" ;; \
+		armhf)   FF_RELEASE="fastfetch-linux-armv7l" ;; \
+		ppc64el) FF_RELEASE="fastfetch-linux-ppc64le" ;; \
+		s390x)   FF_RELEASE="fastfetch-linux-s390x" ;; \
+		riscv64) FF_RELEASE="fastfetch-linux-riscv64" ;; \
+		i386)    FF_RELEASE="fastfetch-linux-i686" ;; \
+		*) echo "Unsupported architecture: $$arch"; exit 1 ;; \
+	esac; \
+	echo "Downloading $$FF_RELEASE for $(FF_VERSION)..."; \
+	wget -q "https://github.com/fastfetch-cli/fastfetch/releases/download/$(FF_VERSION)/$$FF_RELEASE.tar.gz"; \
+	tar -xf "$$FF_RELEASE.tar.gz"; \
+	rm -f "$$FF_RELEASE.tar.gz"; \
+	echo "$$FF_RELEASE" > .ff_release_name
+
+override_dh_auto_install:
+	@FF_RELEASE=$$(cat .ff_release_name); \
+	mkdir -p debian/fastfetch; \
+	cp -a "$$FF_RELEASE/usr" debian/fastfetch/; \
+	rm -f debian/fastfetch/usr/bin/flashfetch; \
+	rm -rf debian/fastfetch/usr/share/licenses
+
+override_dh_auto_test:
+
+override_dh_auto_clean:
+	@if [ -f .ff_release_name ]; then \
+		FF_RELEASE=$$(cat .ff_release_name); \
+		rm -rf "$$FF_RELEASE" .ff_release_name || true; \
+	fi
+
+override_dh_strip:
+
+override_dh_shlibdeps:

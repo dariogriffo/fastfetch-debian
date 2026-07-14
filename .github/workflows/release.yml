@@ -1,0 +1,98 @@
+name: Build fastfetch for Debian
+
+on:
+  workflow_dispatch:
+    inputs:
+      fastfetch_version:
+        description: The version of fastfetch to build.
+        type: string
+        required: true
+      build_version:
+        description: The build version.
+        type: string
+        required: true
+      architecture:
+        description: Architecture to build (amd64, arm64, armel, armhf, ppc64el, s390x, riscv64, i386, or 'all' for all architectures)
+        type: choice
+        default: 'all'
+        options:
+          - 'all'
+          - 'amd64'
+          - 'arm64'
+          - 'armel'
+          - 'armhf'
+          - 'ppc64el'
+          - 's390x'
+          - 'riscv64'
+          - 'i386'
+
+permissions:
+  contents: write
+
+jobs:
+  build-fastfetch:
+    name: Build Binary Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fastfetch-debian
+        uses: actions/checkout@v4
+
+      - name: Build fastfetch
+        run: ./build_debian.sh ${{ inputs.fastfetch_version }} ${{ inputs.build_version }} ${{ inputs.architecture }} && ./build_ubuntu.sh ${{ inputs.fastfetch_version }} ${{ inputs.build_version }} ${{ inputs.architecture }}
+
+      - name: Upload Binary Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-artifact
+          path: fastfetch_*.deb
+
+  build-src:
+    name: Build Source Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fastfetch-debian
+        uses: actions/checkout@v4
+
+      - name: Install dpkg-dev
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends dpkg-dev devscripts wget ca-certificates
+
+      - name: Build source packages
+        run: ./build_src.sh ${{ inputs.fastfetch_version }} ${{ inputs.build_version }}
+
+      - name: Upload Source Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-artifact
+          path: |
+            fastfetch_*.dsc
+            fastfetch_*.orig.tar.gz
+            fastfetch_*.debian.tar.xz
+
+  release-fastfetch:
+    name: Release fastfetch for Debian
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [build-fastfetch, build-src]
+    steps:
+      - name: Download Binary Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: binary-artifact
+
+      - name: Download Source Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: source-artifact
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          files: |
+            fastfetch_*.deb
+            fastfetch_*.dsc
+            fastfetch_*.orig.tar.gz
+            fastfetch_*.debian.tar.xz
+          name: ${{ inputs.fastfetch_version }}+${{ inputs.build_version }}
+          tag_name: ${{ inputs.fastfetch_version }}+${{ inputs.build_version }}
+          fail_on_unmatched_files: true

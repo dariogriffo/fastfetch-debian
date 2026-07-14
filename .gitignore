@@ -1,0 +1,9 @@
+# .deb Packages
+*.deb
+
+.idea/*
+.DS_Store
+fastfetch-linux-*
+*.dsc
+*.orig.tar.gz
+*.debian.tar.xz

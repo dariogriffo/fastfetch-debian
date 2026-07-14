@@ -1,0 +1,17 @@
+Source: fastfetch
+Section: utils
+Priority: optional
+Maintainer: Dario Griffo <dariogriffo@gmail.com>
+Build-Depends: debhelper-compat (= 13), wget, ca-certificates
+Standards-Version: 4.6.2
+Homepage: https://github.com/fastfetch-cli/fastfetch
+Rules-Requires-Root: no
+
+Package: fastfetch
+Architecture: amd64 arm64 armel armhf ppc64el s390x riscv64 i386
+Depends: ${misc:Depends}
+Description: neofetch-like tool for fetching system information
+ Fastfetch is a neofetch-like tool for fetching system information and
+ displaying it in a pretty way. It is written mainly in C, with
+ performance and customizability in mind. This package tracks upstream
+ releases and follows the Debian archive's file layout.

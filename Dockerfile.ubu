@@ -1,0 +1,38 @@
+ARG UBUNTU_DIST=noble
+FROM ubuntu:noble
+
+ARG UBUNTU_DIST
+ARG fastfetch_VERSION
+ARG BUILD_VERSION
+ARG FULL_VERSION
+ARG ARCH
+ARG FF_RELEASE
+
+RUN mkdir -p /output/DEBIAN
+
+# Upstream tarball ships a full usr/ tree (binary, presets, completions, man).
+COPY ${FF_RELEASE}/usr/ /output/usr/
+
+# Align with the Debian archive's fastfetch layout:
+#   no flashfetch, no usr/share/licenses (copyright file instead), gzipped man.
+RUN rm -f /output/usr/bin/flashfetch
+RUN rm -rf /output/usr/share/licenses
+RUN gzip -9n /output/usr/share/man/man1/fastfetch.1
+
+RUN mkdir -p /output/usr/share/doc/fastfetch
+COPY output/DEBIAN/control /output/DEBIAN/
+COPY output/DEBIAN/postinst /output/DEBIAN/postinst
+RUN chmod 755 /output/DEBIAN/postinst
+COPY output/copyright /output/usr/share/doc/fastfetch/
+COPY output/changelog.Debian /output/usr/share/doc/fastfetch/
+COPY output/README.md /output/usr/share/doc/fastfetch/
+
+RUN sed -i "s/DIST/$UBUNTU_DIST/" /output/usr/share/doc/fastfetch/changelog.Debian
+RUN sed -i "s/FULL_VERSION/$FULL_VERSION/" /output/usr/share/doc/fastfetch/changelog.Debian
+RUN gzip -9n /output/usr/share/doc/fastfetch/changelog.Debian
+RUN sed -i "s/DIST/$UBUNTU_DIST/" /output/DEBIAN/control
+RUN sed -i "s/fastfetch_VERSION/$fastfetch_VERSION/" /output/DEBIAN/control
+RUN sed -i "s/BUILD_VERSION/$BUILD_VERSION/" /output/DEBIAN/control
+RUN sed -i "s/SUPPORTED_ARCHITECTURES/$ARCH/" /output/DEBIAN/control
+
+RUN dpkg-deb --build /output /fastfetch_${FULL_VERSION}.deb
