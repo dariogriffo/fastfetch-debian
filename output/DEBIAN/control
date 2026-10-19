@@ -5,4 +5,5 @@ Homepage: https://github.com/fastfetch-cli/fastfetch
 Package: fastfetch
 Version: fastfetch_VERSION-BUILD_VERSION~griffo
 Architecture: SUPPORTED_ARCHITECTURES
+Depends: libc6 (>= 2.34)
 Description: neofetch-like tool for fetching system information and displaying it in a pretty way.

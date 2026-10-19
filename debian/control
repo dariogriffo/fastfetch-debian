@@ -9,7 +9,7 @@ Rules-Requires-Root: no
 
 Package: fastfetch
 Architecture: amd64 arm64 armel armhf ppc64el s390x riscv64 i386
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, libc6 (>= 2.34)
 Description: neofetch-like tool for fetching system information
  Fastfetch is a neofetch-like tool for fetching system information and
  displaying it in a pretty way. It is written mainly in C, with
