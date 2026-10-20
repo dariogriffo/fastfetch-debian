@@ -6,7 +6,7 @@ if [ -z "$fastfetch_VERSION" ] || [ -z "$BUILD_VERSION" ]; then
     echo "Usage: $0 <fastfetch_version> <build_version> [architecture]"
     echo "Example: $0 2.66.0 1 arm64"
     echo "Example: $0 2.66.0 1 all    # Build for all architectures"
-    echo "Supported architectures: amd64, arm64, armel, armhf, ppc64el, s390x, riscv64, i386, all"
+    echo "Supported architectures: amd64, arm64, armhf, ppc64el, s390x, riscv64, i386, all"
     exit 1
 fi
 
@@ -19,9 +19,6 @@ get_ff_release() {
             ;;
         "arm64")
             echo "fastfetch-linux-aarch64"
-            ;;
-        "armel")
-            echo "fastfetch-linux-armv6l"
             ;;
         "armhf")
             echo "fastfetch-linux-armv7l"
@@ -52,7 +49,7 @@ build_architecture() {
     ff_release=$(get_ff_release "$build_arch")
     if [ -z "$ff_release" ]; then
         echo "❌ Unsupported architecture: $build_arch"
-        echo "Supported architectures: amd64, arm64, armel, armhf, ppc64el, s390x, riscv64, i386"
+        echo "Supported architectures: amd64, arm64, armhf, ppc64el, s390x, riscv64, i386"
         return 1
     fi
 
@@ -114,7 +111,7 @@ if [ "$ARCH" = "all" ]; then
     echo "🚀 Building fastfetch $fastfetch_VERSION-$BUILD_VERSION for all supported architectures..."
     echo ""
 
-    ARCHITECTURES=("amd64" "arm64" "armel" "armhf" "ppc64el" "s390x" "riscv64" "i386")
+    ARCHITECTURES=("amd64" "arm64" "armhf" "ppc64el" "s390x" "riscv64" "i386")
 
     for build_arch in "${ARCHITECTURES[@]}"; do
         echo "==========================================="

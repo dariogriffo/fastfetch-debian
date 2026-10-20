@@ -10,7 +10,7 @@ file layout (presets under /usr/share/fastfetch/presets, bash/fish/zsh
 completions, gzipped man page — no flashfetch, no bundled licenses dir).
 Served from **[deb.griffo.io](https://deb.griffo.io)** for Debian (bookworm,
 trixie, forky, sid) and Ubuntu (jammy, noble, questing, resolute) on amd64,
-arm64, armel, armhf, ppc64el, s390x, riscv64 and i386.
+arm64, armhf, ppc64el, s390x, riscv64 and i386.
 
 ## Install
 
